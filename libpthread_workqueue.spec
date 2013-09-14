@@ -16,7 +16,6 @@ pthread_workqueue API first introduced in Mac OS X. It is primarily
 intended for use with libdispatch but can be used as a general purpose
 thread pool library for C programs.
 
-
 %description -l pl.UTF-8
 libpthread_workqueue to przenośna implementacja API pthread_workqueue,
 które pojawiło się po raz pierwszy w systemie Mac OS X. Głównym celem
@@ -59,7 +58,8 @@ LDFLAGS="%{rpmldflags}" \
 ./configure \
 	--prefix=%{_prefix} \
 	--libdir=%{_libdir}
-%{__make}
+# build is racy
+%{__make} -j1
 
 %{__make} libpthread_workqueue.a
 
