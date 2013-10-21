@@ -1,13 +1,17 @@
 Summary:	Thread pool for libdispatch
 Summary(pl.UTF-8):	Pula wątkow dla libdispatch
 Name:		libpthread_workqueue
-Version:	0.8.2
+Version:	0.9
 Release:	1
 License:	BSD
 Group:		Libraries
 Source0:	http://downloads.sourceforge.net/libpwq/%{name}-%{version}.tar.gz
-# Source0-md5:	20a31adf78d205a801ad5d9b19ee33a0
+# Source0-md5:	57910365f4741aaac533aa4344a21497
+Patch0:		%{name}-link.patch
 URL:		http://sourceforge.net/projects/libpwq/
+BuildRequires:	autoconf >= 2.50
+BuildRequires:	automake
+BuildRequires:	libtool >= 2:2
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -48,28 +52,23 @@ Statyczna biblioteka libpthread_workqueue.
 
 %prep
 %setup -q
+%patch0 -p1
 
 %build
-# NOTE: not autoconf configure
-CC="%{__cc}" \
-CFLAGS="%{rpmcflags} -Iinclude -Isrc" \
-CPPFLAGS="%{rpmcppflags}" \
-LDFLAGS="%{rpmldflags}" \
-./configure \
-	--prefix=%{_prefix} \
-	--libdir=%{_libdir}
-# build is racy
-%{__make} -j1
+%{__libtoolize}
+%{__aclocal}
+%{__autoconf}
+%{__autoheader}
+%{__automake}
+%configure
 
-%{__make} libpthread_workqueue.a
+%{__make}
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
-
-install libpthread_workqueue.a $RPM_BUILD_ROOT%{_libdir}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -86,6 +85,7 @@ rm -rf $RPM_BUILD_ROOT
 %files devel
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libpthread_workqueue.so
+%{_libdir}/libpthread_workqueue.la
 %{_includedir}/pthread_workqueue.h
 %{_mandir}/man3/pthread_workqueue.3*
 
